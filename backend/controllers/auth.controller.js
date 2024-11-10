@@ -3,7 +3,8 @@ import bcrypt from "bcryptjs";
 import crypto from "crypto"
 import { generateVerificationCode } from "../utils/generateVerificationCode.js";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
-import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail } from "../mailtrap/emails.js";
+import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendResetSuccessEmail } from "../mailtrap/emails.js";
+import { error } from "console";
 
 
 export const signup = async (req, res) => {
@@ -101,7 +102,6 @@ export const verifyEmail = async (req, res) => {
 	}
 }
 
-
 export const forgotPassword = async (req, res) => {
 	const { email } = req.body;
 	
@@ -119,5 +119,43 @@ export const forgotPassword = async (req, res) => {
 		res.status(200).json({ success: true, message: "Password reset link sent to your email" })
 	} catch (err) {
 		res.status(400).json({ success: false, message: "Couldn't send reset email" })
+	}
+}
+
+export const resetPassword = async (req, res) => {
+	try {
+		const { token } = req.params;
+		const { password } = req.body;
+
+		console.log("password: ", password)
+		const user = await User.findOne({
+			resetPasswordToken: token,
+			resetPasswordExpiresAt: { $gt: Date.now() }
+		})
+		if (!user)
+			res.status(400).json({ success: false, message: "Invalid or expired reset token" });
+		const hashedPass = await bcrypt.hash(password, 10);
+		user.password = hashedPass;
+		user.resetPasswordToken = undefined;
+		user.resetPasswordExpiresAt = undefined;
+
+		await user.save();
+		await sendResetSuccessEmail(user.email);
+
+		res.status(200).json({ success: true, message: "Password reset successfully" })
+	} catch (err) {
+		console.log("Error in reset password endpoint: ", err)
+		res.status(400).json({ success: false, message: err.message });
+	}
+}
+
+export const checkAuth = async (req, res) => {
+	try {
+		const user = await User.findById(req.userId).select("-password");
+		if (!user)
+			return res.status(400).json({ success: false, message: "User not found" })
+		res.status(200).json({ success: true, user})
+	} catch (err) {
+
 	}
 }
