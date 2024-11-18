@@ -3,7 +3,7 @@ import Input from "../components/Input";
 import { Mail, User, Loader, Lock } from 'lucide-react'
 import { useState } from "react";
 import { Link } from "react-router-dom"
-import PaaswordStrengthMeter from "../components/PasswordStrengthMeter";
+import PasswordStrengthMeter from "../components/PasswordStrengthMeter";
 
 
 const SignUpPage = () => {
@@ -44,7 +44,7 @@ const SignUpPage = () => {
 					value={password}
 					onChange={(e) => setPassword(e.target.value)}
 				/>
-				<PaaswordStrengthMeter password={password}/>
+				<PasswordStrengthMeter password={password}/>
 				<motion.button
 					className="mt-5 w-full py-3 px-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white 
 						font-bold rounded-lg shadow-lg hover:from-green-600
