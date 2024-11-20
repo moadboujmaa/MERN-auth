@@ -4,11 +4,11 @@ import crypto from "crypto"
 import { generateVerificationCode } from "../utils/generateVerificationCode.js";
 import { generateTokenAndSetCookie } from "../utils/generateTokenAndSetCookie.js";
 import { sendVerificationEmail, sendWelcomeEmail, sendPasswordResetEmail, sendResetSuccessEmail } from "../mailtrap/emails.js";
-import { error } from "console";
 
 
 export const signup = async (req, res) => {
 	const { email, password, name } = req.body;
+	console.log("signup body: ", req.body)
 	try {
 		if (!email || !password || !name)
 			throw new Error("All fields are required");
