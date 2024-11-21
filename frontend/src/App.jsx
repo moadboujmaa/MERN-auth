@@ -7,6 +7,7 @@ import EmailVerificationPage from "./pages/EmailVerificationPage"
 import { Toaster } from "react-hot-toast"
 import { useAuthStore } from "./store/authStore"
 import { useEffect } from "react"
+import LoadingSpinner from "./components/LoadingSpinner"
 
 const ProtectedRoutes = ({children}) => {
   const { isAuthenticated, user } = useAuthStore();
@@ -26,14 +27,13 @@ const RedirectAuthenticatedUser = ({ children }) => {
 }
 
 function App() {
-  const { isCheckingAuth, checkAuth, isAuthenticated, user } = useAuthStore();
+  const { isCheckingAuth, checkAuth } = useAuthStore();
 
   useEffect(() => {
     checkAuth();
   }, [checkAuth])
 
-  console.log("isAuthenticated: ", isAuthenticated);
-  console.log("user: ", user);
+  { isCheckingAuth && <LoadingSpinner /> }  
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-green-900 to-emerald-900 flex items-center justify-center relative overflow-hidden">
       <FloatingShape color="bg-green-500" size="w-64 h-64" top="-5%" left="10%" delay={0} />
